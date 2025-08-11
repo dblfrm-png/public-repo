@@ -1,27 +1,21 @@
-name: Hourly Discord Bot
+import discord
+import asyncio
+import os
 
-on:
-  workflow_dispatch:  # allow manual run
-  schedule:
-    - cron: "0 * * * *"  # run every hour UTC
+TOKEN = os.environ["BOT_TOKEN"]
+CHANNEL_ID = int(os.environ["CHANNEL_ID"])
 
-jobs:
-  send:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+class MyClient(discord.Client):
+    async def on_ready(self):
+        print(f"Logged in as {self.user}")
+        channel = await self.fetch_channel(CHANNEL_ID)
+        while True:
+            await channel.send("""Sell Baby Bunny for 70 wl
+Sell Yasuke for 10 DL
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.12
+All in world Hwuii""")
+            await asyncio.sleep(3600)  # wait 1 hour
 
-      - name: Install dependencies
-        run: pip install discord.py
-
-      - name: Run bot
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
-        run: python bot.py
+intents = discord.Intents.default()
+client = MyClient(intents=intents)
+client.run(TOKEN)
